@@ -1,4 +1,4 @@
-FROM golang:1.17-alpine3.15 AS builder
+FROM --platform=linux/amd64 golang:1.17-alpine3.15 AS builder
 
 RUN apk -U --no-cache --upgrade --latest add build-base git gcc bash
 
@@ -14,7 +14,7 @@ COPY . .
 
 RUN go build -o /usr/bin/hydra
 
-FROM alpine:3.15
+FROM --platform=linux/amd64 alpine:3.15
 
 COPY --from=builder /usr/bin/hydra /usr/bin/hydra
 
