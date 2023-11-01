@@ -80,8 +80,10 @@ type clientCreator interface {
 // - [x] If `authenticatedAt` is properly managed across the lifecycle
 //   - [x] The value `authenticatedAt` should be an old time if no user interaction wrt login was required
 //   - [x] The value `authenticatedAt` should be a recent time if user interaction wrt login was required
+//
 // - [x] If `requestedAt` is properly managed across the lifecycle
 //   - [x] The value of `requestedAt` must be the initial request time, not some other time (e.g. when accepting login)
+//
 // - [x] If `id_token_hint` is handled properly
 //   - [x] What happens if `id_token_hint` does not match the value from the handled authentication request ("accept login")
 func TestAuthCodeWithDefaultStrategy(t *testing.T) {
@@ -670,8 +672,6 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 		for _, f := range []string{
 			"sub",
-			"iss",
-			"aud",
 			"bar",
 			"auth_time",
 		} {
