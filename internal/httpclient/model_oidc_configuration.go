@@ -84,6 +84,9 @@ type OidcConfiguration struct {
 	UserinfoSignedResponseAlg []string `json:"userinfo_signed_response_alg"`
 	// OpenID Connect Supported Userinfo Signing Algorithm  JSON array containing a list of the JWS [JWS] signing algorithms (alg values) [JWA] supported by the UserInfo Endpoint to encode the Claims in a JWT [JWT].
 	UserinfoSigningAlgValuesSupported []string `json:"userinfo_signing_alg_values_supported,omitempty"`
+	ClaimTypesSupported []string `json:"claim_types_supported"`
+
+	UiLocalesSupported []string `json:"ui_locales_supported"`
 }
 
 type _OidcConfiguration OidcConfiguration

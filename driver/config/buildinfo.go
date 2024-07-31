@@ -4,7 +4,7 @@
 package config
 
 var (
-	Version = "master"
+	Version = "2.2"
 	Date    = "undefined"
 	Commit  = "undefined"
 )

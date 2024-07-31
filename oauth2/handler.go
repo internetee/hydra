@@ -249,7 +249,7 @@ type oidcConfiguration struct {
 	// OpenID Connect Dynamic Client Registration Endpoint URL
 	//
 	// example: https://playground.ory.sh/ory-hydra/admin/client
-	RegistrationEndpoint string `json:"registration_endpoint,omitempty"`
+	// RegistrationEndpoint string `json:"registration_endpoint,omitempty"`
 
 	// OAuth 2.0 Token Endpoint URL
 	//
@@ -304,7 +304,7 @@ type oidcConfiguration struct {
 	// OAuth 2.0 Supported Response Modes
 	//
 	// JSON array containing a list of the OAuth 2.0 response_mode values that this OP supports.
-	ResponseModesSupported []string `json:"response_modes_supported"`
+	// ResponseModesSupported []string `json:"response_modes_supported"`
 
 	// OpenID Connect Userinfo URL
 	//
@@ -353,56 +353,56 @@ type oidcConfiguration struct {
 	// OpenID Connect Request Parameter Supported
 	//
 	// Boolean value specifying whether the OP supports use of the request parameter, with true indicating support.
-	RequestParameterSupported bool `json:"request_parameter_supported"`
+	// RequestParameterSupported bool `json:"request_parameter_supported"`
 
 	// OpenID Connect Request URI Parameter Supported
 	//
 	// Boolean value specifying whether the OP supports use of the request_uri parameter, with true indicating support.
-	RequestURIParameterSupported bool `json:"request_uri_parameter_supported"`
+	// RequestURIParameterSupported bool `json:"request_uri_parameter_supported"`
 
 	// OpenID Connect Requires Request URI Registration
 	//
 	// Boolean value specifying whether the OP requires any request_uri values used to be pre-registered
 	// using the request_uris registration parameter.
-	RequireRequestURIRegistration bool `json:"require_request_uri_registration"`
+	// RequireRequestURIRegistration bool `json:"require_request_uri_registration"`
 
 	// OpenID Connect Claims Parameter Parameter Supported
 	//
 	// Boolean value specifying whether the OP supports use of the claims parameter, with true indicating support.
-	ClaimsParameterSupported bool `json:"claims_parameter_supported"`
+	// ClaimsParameterSupported bool `json:"claims_parameter_supported"`
 
 	// OAuth 2.0 Token Revocation URL
 	//
 	// URL of the authorization server's OAuth 2.0 revocation endpoint.
-	RevocationEndpoint string `json:"revocation_endpoint"`
+	// RevocationEndpoint string `json:"revocation_endpoint"`
 
 	// OpenID Connect Back-Channel Logout Supported
 	//
 	// Boolean value specifying whether the OP supports back-channel logout, with true indicating support.
-	BackChannelLogoutSupported bool `json:"backchannel_logout_supported"`
+	// BackChannelLogoutSupported bool `json:"backchannel_logout_supported"`
 
 	// OpenID Connect Back-Channel Logout Session Required
 	//
 	// Boolean value specifying whether the OP can pass a sid (session ID) Claim in the Logout Token to identify the RP
 	// session with the OP. If supported, the sid Claim is also included in ID Tokens issued by the OP
-	BackChannelLogoutSessionSupported bool `json:"backchannel_logout_session_supported"`
+	// BackChannelLogoutSessionSupported bool `json:"backchannel_logout_session_supported"`
 
 	// OpenID Connect Front-Channel Logout Supported
 	//
 	// Boolean value specifying whether the OP supports HTTP-based logout, with true indicating support.
-	FrontChannelLogoutSupported bool `json:"frontchannel_logout_supported"`
+	// FrontChannelLogoutSupported bool `json:"frontchannel_logout_supported"`
 
 	// OpenID Connect Front-Channel Logout Session Required
 	//
 	// Boolean value specifying whether the OP can pass iss (issuer) and sid (session ID) query parameters to identify
 	// the RP session with the OP when the frontchannel_logout_uri is used. If supported, the sid Claim is also
 	// included in ID Tokens issued by the OP.
-	FrontChannelLogoutSessionSupported bool `json:"frontchannel_logout_session_supported"`
+	// FrontChannelLogoutSessionSupported bool `json:"frontchannel_logout_session_supported"`
 
 	// OpenID Connect End-Session Endpoint
 	//
 	// URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.
-	EndSessionEndpoint string `json:"end_session_endpoint"`
+	// EndSessionEndpoint string `json:"end_session_endpoint"`
 
 	// OpenID Connect Supported Request Object Signing Algorithms
 	//
@@ -410,23 +410,27 @@ type oidcConfiguration struct {
 	// which are described in Section 6.1 of OpenID Connect Core 1.0 [OpenID.Core]. These algorithms are used both when
 	// the Request Object is passed by value (using the request parameter) and when it is passed by reference
 	// (using the request_uri parameter).
-	RequestObjectSigningAlgValuesSupported []string `json:"request_object_signing_alg_values_supported"`
+	// RequestObjectSigningAlgValuesSupported []string `json:"request_object_signing_alg_values_supported"`
 
 	// OAuth 2.0 PKCE Supported Code Challenge Methods
 	//
 	// JSON array containing a list of Proof Key for Code Exchange (PKCE) [RFC7636] code challenge methods supported
 	// by this authorization server.
-	CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported"`
+	// CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported"`
 
 	// OpenID Connect Verifiable Credentials Endpoint
 	//
 	// Contains the URL of the Verifiable Credentials Endpoint.
-	CredentialsEndpointDraft00 string `json:"credentials_endpoint_draft_00"`
+	// CredentialsEndpointDraft00 string `json:"credentials_endpoint_draft_00"`
 
 	// OpenID Connect Verifiable Credentials Supported
 	//
 	// JSON array containing a list of the Verifiable Credentials supported by this authorization server.
-	CredentialsSupportedDraft00 []CredentialSupportedDraft00 `json:"credentials_supported_draft_00"`
+	// CredentialsSupportedDraft00 []CredentialSupportedDraft00 `json:"credentials_supported_draft_00"`
+
+	ClaimTypesSupported []string `json:"claim_types_supported"`
+
+	UiLocalesSupported []string `json:"ui_locales_supported"`
 }
 
 // Verifiable Credentials Metadata (Draft 00)
@@ -481,46 +485,48 @@ func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	h.r.Writer().Write(w, r, &oidcConfiguration{
-		Issuer:                                 h.c.IssuerURL(ctx).String(),
-		AuthURL:                                h.c.OAuth2AuthURL(ctx).String(),
-		TokenURL:                               h.c.OAuth2TokenURL(ctx).String(),
-		JWKsURI:                                h.c.JWKSURL(ctx).String(),
-		RevocationEndpoint:                     urlx.AppendPaths(h.c.IssuerURL(ctx), RevocationPath).String(),
-		RegistrationEndpoint:                   h.c.OAuth2ClientRegistrationURL(ctx).String(),
-		SubjectTypes:                           h.c.SubjectTypesSupported(ctx),
-		ResponseTypes:                          []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
-		ClaimsSupported:                        h.c.OIDCDiscoverySupportedClaims(ctx),
-		ScopesSupported:                        h.c.OIDCDiscoverySupportedScope(ctx),
-		UserinfoEndpoint:                       h.c.OIDCDiscoveryUserinfoEndpoint(ctx).String(),
-		TokenEndpointAuthMethodsSupported:      []string{"client_secret_post", "client_secret_basic", "private_key_jwt", "none"},
-		IDTokenSigningAlgValuesSupported:       []string{key.Algorithm},
-		IDTokenSignedResponseAlg:               []string{key.Algorithm},
-		UserinfoSignedResponseAlg:              []string{key.Algorithm},
-		GrantTypesSupported:                    []string{"authorization_code", "implicit", "client_credentials", "refresh_token"},
-		ResponseModesSupported:                 []string{"query", "fragment"},
-		UserinfoSigningAlgValuesSupported:      []string{"none", key.Algorithm},
-		RequestParameterSupported:              true,
-		RequestURIParameterSupported:           true,
-		RequireRequestURIRegistration:          true,
-		BackChannelLogoutSupported:             true,
-		BackChannelLogoutSessionSupported:      true,
-		FrontChannelLogoutSupported:            true,
-		FrontChannelLogoutSessionSupported:     true,
-		EndSessionEndpoint:                     urlx.AppendPaths(h.c.IssuerURL(ctx), LogoutPath).String(),
-		RequestObjectSigningAlgValuesSupported: []string{"none", "RS256", "ES256"},
-		CodeChallengeMethodsSupported:          []string{"plain", "S256"},
-		CredentialsEndpointDraft00:             h.c.CredentialsEndpointURL(ctx).String(),
-		CredentialsSupportedDraft00: []CredentialSupportedDraft00{{
-			Format:                               "jwt_vc_json",
-			Types:                                []string{"VerifiableCredential", "UserInfoCredential"},
-			CryptographicBindingMethodsSupported: []string{"jwk"},
-			CryptographicSuitesSupported: []string{
-				"PS256", "RS256", "ES256",
-				"PS384", "RS384", "ES384",
-				"PS512", "RS512", "ES512",
-				"EdDSA",
-			},
-		}},
+		Issuer:   h.c.IssuerURL(ctx).String(),
+		AuthURL:  h.c.OAuth2AuthURL(ctx).String(),
+		TokenURL: h.c.OAuth2TokenURL(ctx).String(),
+		JWKsURI:  h.c.JWKSURL(ctx).String(),
+		// RevocationEndpoint:                     urlx.AppendPaths(h.c.IssuerURL(ctx), RevocationPath).String(),
+		// RegistrationEndpoint:              h.c.OAuth2ClientRegistrationURL(ctx).String(),
+		SubjectTypes:                      h.c.SubjectTypesSupported(ctx),
+		ResponseTypes:                     []string{"code"},
+		ClaimsSupported:                   h.c.OIDCDiscoverySupportedClaims(ctx),
+		ScopesSupported:                   h.c.OIDCDiscoverySupportedScope(ctx),
+		UserinfoEndpoint:                  h.c.OIDCDiscoveryUserinfoEndpoint(ctx).String(),
+		TokenEndpointAuthMethodsSupported: []string{"client_secret_basic"},
+		IDTokenSigningAlgValuesSupported:  []string{key.Algorithm},
+		IDTokenSignedResponseAlg:          []string{key.Algorithm},
+		UserinfoSignedResponseAlg:         []string{key.Algorithm},
+		GrantTypesSupported:               []string{"authorization_code"},
+		// ResponseModesSupported:                 []string{"query", "fragment"},
+		UserinfoSigningAlgValuesSupported: []string{"none", key.Algorithm},
+		// RequestParameterSupported:              true,
+		// RequestURIParameterSupported:           true,
+		// RequireRequestURIRegistration:          true,
+		// BackChannelLogoutSupported:             true,
+		// BackChannelLogoutSessionSupported:      true,
+		// FrontChannelLogoutSupported:            true,
+		// FrontChannelLogoutSessionSupported:     true,
+		// EndSessionEndpoint:                     urlx.AppendPaths(h.c.IssuerURL(ctx), LogoutPath).String(),
+		// RequestObjectSigningAlgValuesSupported: []string{"none", "RS256", "ES256"},
+		// CodeChallengeMethodsSupported:          []string{"plain", "S256"},
+		// CredentialsEndpointDraft00: h.c.CredentialsEndpointURL(ctx).String(),
+		// CredentialsSupportedDraft00: []CredentialSupportedDraft00{{
+		// 	Format:                               "jwt_vc_json",
+		// 	Types:                                []string{"VerifiableCredential", "UserInfoCredential"},
+		// 	CryptographicBindingMethodsSupported: []string{"jwk"},
+		// 	CryptographicSuitesSupported: []string{
+		// 		"PS256", "RS256", "ES256",
+		// 		"PS384", "RS384", "ES384",
+		// 		"PS512", "RS512", "ES512",
+		// 		"EdDSA",
+		// 	},
+		// }},
+		ClaimTypesSupported: []string{"normal"},
+		UiLocalesSupported:  []string{"et", "en", "ru"},
 	})
 }
 
@@ -637,29 +643,47 @@ func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	interim := ar.GetSession().(*Session).IDTokenClaims().ToMap()
+	interim["auth_time"] = interim["iat"]
 	delete(interim, "nonce")
 	delete(interim, "at_hash")
 	delete(interim, "c_hash")
 	delete(interim, "exp")
 	delete(interim, "sid")
 	delete(interim, "jti")
+	delete(interim, "state")
+	delete(interim, "iat")
+	delete(interim, "iss")
+	delete(interim, "nbf")
+	delete(interim, "aud")
+	delete(interim, "rat")
+	delete(interim, "amr")
 
-	aud, ok := interim["aud"].([]string)
-	if !ok || len(aud) == 0 {
-		aud = []string{c.GetID()}
-	} else {
-		found := false
-		for _, a := range aud {
-			if a == c.GetID() {
-				found = true
-				break
+	if interim["profile_attributes"] != nil {
+		profileAttributes := interim["profile_attributes"].(map[string]interface{})
+		for key, element := range profileAttributes {
+			if key != "subject" {
+				interim[key] = element
 			}
 		}
-		if !found {
-			aud = append(aud, c.GetID())
-		}
+		delete(interim, "profile_attributes")
 	}
-	interim["aud"] = aud
+
+	// aud, ok := interim["aud"].([]string)
+	// if !ok || len(aud) == 0 {
+	// 	aud = []string{c.GetID()}
+	// } else {
+	// 	found := false
+	// 	for _, a := range aud {
+	// 		if a == c.GetID() {
+	// 			found = true
+	// 			break
+	// 		}
+	// 	}
+	// 	if !found {
+	// 		aud = append(aud, c.GetID())
+	// 	}
+	// }
+	// interim["aud"] = aud
 
 	if c.UserinfoSignedResponseAlg == "RS256" {
 		interim["jti"] = uuid.New()
