@@ -1,0 +1,29 @@
+FROM --platform=linux/amd64 golang:1.21 AS builder
+
+WORKDIR /go/src/github.com/ory/hydra
+
+RUN apt-get update && apt-get upgrade -y &&\
+    mkdir -p ./internal/httpclient
+
+COPY go.mod go.sum ./
+COPY internal/httpclient/go.* ./internal/httpclient/
+
+ENV GO111MODULE on
+ENV CGO_ENABLED 1
+
+RUN go mod download
+
+COPY . .
+RUN go build -o /usr/bin/hydra
+
+#########################
+
+FROM --platform=linux/amd64 gcr.io/distroless/base-nossl-debian12:nonroot AS runner
+
+COPY --from=builder /usr/bin/hydra /usr/bin/hydra
+
+# Declare the standard ports used by hydra (4444 for public service endpoint, 4445 for admin service endpoint)
+EXPOSE 4444 4445
+
+ENTRYPOINT ["hydra"]
+CMD ["serve", "all"]
