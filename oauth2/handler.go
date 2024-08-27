@@ -665,7 +665,7 @@ func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 		interim["jti"] = uuid.New()
 		interim["iat"] = time.Now().Unix()
 
-		keyID, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(r.Context())
+		keyID, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(ctx)
 		if err != nil {
 			h.r.Writer().WriteError(w, r, err)
 			return
@@ -727,7 +727,7 @@ type revokeOAuth2Token struct {
 //	  default: errorOAuth2
 func (h *Handler) revokeOAuth2Token(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	events.Trace(r.Context(), events.AccessTokenRevoked)
+	events.Trace(ctx, events.AccessTokenRevoked)
 
 	err := h.r.OAuth2Provider().NewRevocationRequest(ctx, r)
 	if err != nil {
@@ -931,7 +931,8 @@ type oAuth2TokenExchange struct {
 // Use open source libraries to perform OAuth 2.0 and OpenID Connect
 // available for any programming language. You can find a list of libraries here https://oauth.net/code/
 //
-// The Ory SDK is not yet able to this endpoint properly.
+// This endpoint should not be used via the Ory SDK and is only included for technical reasons.
+// Instead, use one of the libraries linked above.
 //
 //	Consumes:
 //	- application/x-www-form-urlencoded
@@ -979,13 +980,13 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 		}
 		session.ClientID = accessRequest.GetClient().GetID()
 		session.KID = accessTokenKeyID
-		session.DefaultSession.Claims.Issuer = h.c.IssuerURL(r.Context()).String()
+		session.DefaultSession.Claims.Issuer = h.c.IssuerURL(ctx).String()
 		session.DefaultSession.Claims.IssuedAt = time.Now().UTC()
 
 		scopes := accessRequest.GetRequestedScopes()
 
 		// Added for compatibility with MITREid
-		if h.c.GrantAllClientCredentialsScopesPerDefault(r.Context()) && len(scopes) == 0 {
+		if h.c.GrantAllClientCredentialsScopesPerDefault(ctx) && len(scopes) == 0 {
 			for _, scope := range accessRequest.GetClient().GetScopes() {
 				accessRequest.GrantScope(scope)
 			}
@@ -1035,16 +1036,18 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 // Use open source libraries to perform OAuth 2.0 and OpenID Connect
 // available for any programming language. You can find a list of libraries at https://oauth.net/code/
 //
-// The Ory SDK is not yet able to this endpoint properly.
+// This endpoint should not be used via the Ory SDK and is only included for technical reasons.
+// Instead, use one of the libraries linked above.
 //
-//	Consumes:
-//	- application/x-www-form-urlencoded
+// Consumes:
+// - application/x-www-form-urlencoded
 //
-//	Schemes: http, https
+// Schemes: http, https
 //
-//	Responses:
-//	  302: emptyResponse
-//	  default: errorOAuth2
+// Responses:
+//
+//	302: emptyResponse
+//	default: errorOAuth2
 func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := r.Context()
 
@@ -1086,7 +1089,7 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ http
 	}
 
 	var accessTokenKeyID string
-	if h.c.AccessTokenStrategy(r.Context(), client.AccessTokenStrategySource(authorizeRequest.GetClient())) == "jwt" {
+	if h.c.AccessTokenStrategy(ctx, client.AccessTokenStrategySource(authorizeRequest.GetClient())) == "jwt" {
 		accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(ctx)
 		if err != nil {
 			x.LogError(r, err, h.r.Logger())

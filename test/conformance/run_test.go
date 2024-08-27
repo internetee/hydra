@@ -219,7 +219,7 @@ func createPlan(t *testing.T, extra url.Values, isParallel bool) {
 				t.Skipf("Test module 'oidcc-server-rotate-keys' can not run in parallel tests and was skipped...")
 				return
 			} else if module != "oidcc-server-rotate-keys" && !isParallel {
-				t.Skipf("Without paralleism only test module 'oidcc-server-rotate-keys' will be executed.")
+				t.Skipf("Without parallelism only test module 'oidcc-server-rotate-keys' will be executed.")
 				return
 			}
 
@@ -272,7 +272,7 @@ func createPlan(t *testing.T, extra url.Values, isParallel bool) {
 								bo := conf.NextBackOff()
 								require.NotEqual(t, backoff.Stop, bo, "%+v", err)
 
-								_, _, err = hydra.JwkApi.CreateJsonWebKeySet(context.Background(), "hydra.openid.id-token").CreateJsonWebKeySet(hydrac.CreateJsonWebKeySet{
+								_, _, err = hydra.JwkAPI.CreateJsonWebKeySet(context.Background(), "hydra.openid.id-token").CreateJsonWebKeySet(hydrac.CreateJsonWebKeySet{
 									Alg: "RS256",
 								}).Execute()
 								if err == nil {
