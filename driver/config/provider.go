@@ -201,7 +201,11 @@ func (p *DefaultProvider) IsDevelopmentMode(ctx context.Context) bool {
 }
 
 func (p *DefaultProvider) WellKnownKeys(ctx context.Context, include ...string) []string {
-	include = append(include, x.OAuth2JWTKeyName, x.OpenIDConnectKeyName)
+	if p.AccessTokenStrategy(ctx) == AccessTokenJWTStrategy {
+		include = append(include, x.OAuth2JWTKeyName)
+	}
+
+	include = append(include, x.OpenIDConnectKeyName)
 	return stringslice.Unique(append(p.getProvider(ctx).Strings(KeyWellKnownKeys), include...))
 }
 

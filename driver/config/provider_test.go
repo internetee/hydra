@@ -277,7 +277,7 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Contains(t, c.DSN(), "sqlite://")
 
 	// webfinger
-	assert.Equal(t, []string{"hydra.openid.id-token", "hydra.jwt.access-token"}, c.WellKnownKeys(ctx))
+	assert.Equal(t, []string{"hydra.openid.id-token"}, c.WellKnownKeys(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://example.com"), c.OAuth2ClientRegistrationURL(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://example.com/jwks.json"), c.JWKSURL(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://example.com/auth"), c.OAuth2AuthURL(ctx))
