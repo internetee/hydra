@@ -260,6 +260,15 @@ func (p *Persister) GetLoginRequest(ctx context.Context, loginChallenge string) 
 	if f.RequestedAt.Add(p.config.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
 		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("The login request has expired, please try again."))
 	}
+
+	// Check if flow exists in database and use login_was_used from database if it exists
+	// The encoded challenge might have stale data, but the database has the truth
+	dbFlow, err := p.GetFlow(ctx, f.ID)
+	if err == nil {
+		// Flow exists in database - use login_was_used from database
+		f.LoginWasUsed = dbFlow.LoginWasUsed
+	}
+
 	lr := f.GetLoginRequest()
 	// Restore the short challenge ID, which was previously sent to the encoded flow,
 	// to make sure that the challenge ID in the returned flow matches the param.
@@ -307,6 +316,27 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verif
 	// We set the consent challenge ID to a new UUID that we can use as a foreign key in the database
 	// without encoding the whole flow.
 	f.ConsentChallengeID = sqlxx.NullString(uuid.Must(uuid.NewV4()).String())
+
+	// Ensure login_was_used is set correctly when the flow is first persisted to the database
+	// The decoded flow should have login_was_used = true if login was invalidated,
+	// but we check the state to be safe (states >= FlowStateConsentInitialized indicate login was used)
+	// State 6 = FlowStateConsentUsed, which means login was already used
+	if !f.LoginWasUsed && (f.State == flow.FlowStateLoginUsed || f.State == flow.FlowStateConsentInitialized || f.State == flow.FlowStateConsentUnused || f.State == flow.FlowStateConsentUsed) {
+		f.LoginWasUsed = true
+	}
+
+	// Debug log: show complete flow before persisting
+	// p.r.Logger().WithFields(map[string]interface{}{
+	// 	"login_challenge":        f.ID,
+	// 	"state":                  f.State,
+	// 	"login_was_used":        f.LoginWasUsed,
+	// 	"consent_was_handled":   f.ConsentWasHandled,
+	// 	"consent_challenge_id":  f.ConsentChallengeID.String(),
+	// 	"subject":               f.Subject,
+	// 	"client_id":              f.ClientID,
+	// 	"requested_at":          f.RequestedAt,
+	// 	"login_authenticated_at": f.LoginAuthenticatedAt,
+	// }).Print("Persisting flow in VerifyAndInvalidateConsentRequest")
 
 	if err = p.Connection(ctx).Create(f); err != nil {
 		return nil, sqlcon.HandleError(err)
