@@ -8,8 +8,8 @@ RUN apt-get update && apt-get upgrade -y &&\
 COPY go.mod go.sum ./
 COPY internal/httpclient/go.* ./internal/httpclient/
 
-ENV GO111MODULE on
-ENV CGO_ENABLED 1
+ENV GO111MODULE=on
+ENV CGO_ENABLED=1
 
 RUN go mod download
 
