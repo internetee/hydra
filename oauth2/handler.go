@@ -496,7 +496,7 @@ func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Reque
 		ClaimsSupported:                   h.c.OIDCDiscoverySupportedClaims(ctx),
 		ScopesSupported:                   h.c.OIDCDiscoverySupportedScope(ctx),
 		UserinfoEndpoint:                  h.c.OIDCDiscoveryUserinfoEndpoint(ctx).String(),
-		TokenEndpointAuthMethodsSupported: []string{"client_secret_basic"},
+		TokenEndpointAuthMethodsSupported: []string{"client_secret_basic", "none"},
 		IDTokenSigningAlgValuesSupported:  []string{key.Algorithm},
 		IDTokenSignedResponseAlg:          []string{key.Algorithm},
 		UserinfoSignedResponseAlg:         []string{key.Algorithm},
