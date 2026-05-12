@@ -334,12 +334,12 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		// Make sure we test against all crypto suites that we advertise.
 		cfg, _, err := publicClient.OidcAPI.DiscoverOidcConfiguration(ctx).Execute()
 		require.NoError(t, err)
-		
+
 		// Skip test if verifiable credentials are not enabled
 		if len(cfg.CredentialsSupportedDraft00) == 0 {
 			t.Skip("Verifiable credentials are not enabled (CredentialsSupportedDraft00 is empty)")
 		}
-		
+
 		supportedCryptoSuites := cfg.CredentialsSupportedDraft00[0].CryptographicSuitesSupported
 
 		run := func(t *testing.T, strategy string) {
